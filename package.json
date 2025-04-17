@@ -1,0 +1,15 @@
+{
+	"name"   : "@essamonline/realtime-leaderboard",
+	"version": "1.0.0",
+	"description": "A backend system for a real-time leaderboard service for ranking and scoring.",
+	"main"   : "index.js",
+	"type"   : "module",
+	"scripts": {
+		"start"    : "node index.js",
+		"test"     : "node --test test/*.test.js",
+		"testCover": "node --experimental-test-coverage --test test/*.test.js"
+	},
+	"keywords": [],
+	"author"  : "",
+	"license" : "MIT"
+}
