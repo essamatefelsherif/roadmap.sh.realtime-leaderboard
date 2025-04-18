@@ -76,7 +76,6 @@ export async function createUserActMiddleware(req, res){
 
 	try{
 		let activities = await leaderboardObj.addUserScore(req.body.activity, req.auth.username, req.body.score);
-
 		res.status(201).send(activities);
 	}
 	catch(err){

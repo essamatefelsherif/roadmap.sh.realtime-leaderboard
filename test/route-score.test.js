@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 /* Import local dependencies */
-import { TestData } from './test-data.js'
+import { TestData } from './test-data.js';
 import dotenv from 'dotenv';
 
 /* Emulate commonJS __filename and __dirname constants */
@@ -526,7 +526,10 @@ async function testMethod(){
 						}
 						else
 						if(typeof this.resBody === 'object'){
-							assert.deepStrictEqual(JSON.parse(body), this.resBody);
+							assert.deepStrictEqual(
+								JSON.parse(body, (key, value) => key !== 'timestamp' ? value : undefined),
+								this.resBody
+							);
 						}
 					}
 					resolve();

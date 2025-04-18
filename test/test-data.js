@@ -66,8 +66,8 @@ export class TestData{
 
 		if(this.init){
 			this.#actsMap.set(this.#initActivity, [{
-				username: this.#initUser,
 				activity: this.#initActivity,
+				username: this.#initUser,
 				score: 100,
 			}]);
 		}
@@ -76,8 +76,8 @@ export class TestData{
 			let acts = [];
 			for(let j = 1; j <= this.numUsers; j++){
 				acts.push({
-					username: `${this.#userPrefix}${j}`,
 					activity: `${this.#activityPrefix}${i}`,
+					username: `${this.#userPrefix}${j}`,
 					score: i * 100 + j * 10,
 				});
 			}

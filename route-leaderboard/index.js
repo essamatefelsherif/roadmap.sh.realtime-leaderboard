@@ -9,6 +9,14 @@
 import { Router } from 'express';
 
 /* Import local dependencies */
+import {
+	getActAllMiddleware,
+	getActTopMiddleware,
+	getActUsrMiddleware,
+	getAllMiddleware,
+	getTopMiddleware,
+	getUsrMiddleware,
+} from './controller.js';
 
 /**
  * @const {object} router - Leaderboard router object.
@@ -20,13 +28,25 @@ const router = Router();
  * ========================================================================================
  * Endpoint                                Method  Authorization  Router-level middleware
  * ========================================================================================
- * /leaderboard/:activity                  GET     Yes            getActMiddleware
- * /leaderboard/:activity/top/:count       GET     Yes            getActMiddleware
- * /leaderboard/:activity/rank/:username   GET     Yes            deleteUserMiddleware
- * /leaderboard/global                     GET     Yes            createUserActMiddleware
- * /leaderboard/global/top/:count          GET     Yes            deleteUserMiddleware
- * /leaderboard/global/rank/:username      GET     Yes            deleteUserMiddleware
+ * /leaderboard/:activity                  GET     Yes            getActAllMiddleware
+ * /leaderboard/:activity/top              GET     Yes            getActTopMiddleware
+ * /leaderboard/:activity/top/:count       GET     Yes            getActTopMiddleware
+ * /leaderboard/:activity/user/:username   GET     Yes            getActUsrMiddleware
+ * /leaderboard/global                     GET     Yes            getAllMiddleware
+ * /leaderboard/global/top                 GET     Yes            getTopMiddleware
+ * /leaderboard/global/top/:count          GET     Yes            getTopMiddleware
+ * /leaderboard/global/user/:username      GET     Yes            getUsrMiddleware
  * ========================================================================================
  */
+
+router.get('/global/user/:username', getUsrMiddleware );
+router.get('/global/top/:count',     getTopMiddleware );
+router.get('/global/top',            getTopMiddleware );
+router.get('/global',                getAllMiddleware );
+
+router.get('/:activity/user/:username', getActUsrMiddleware );
+router.get('/:activity/top/:count',     getActTopMiddleware );
+router.get('/:activity/top',            getActTopMiddleware );
+router.get('/:activity',                getActAllMiddleware );
 
 export { router };
