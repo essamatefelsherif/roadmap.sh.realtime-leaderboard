@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: route-auth/controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: route-auth/controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module  auth-route-controller
+ * @desc    The leaderboard-api authentication controller module.
+ * @version 1.0.0
+ * @author  Essam A. El-Sherif
+ */
+
+/* Import node.js common modules */
+import { createHash } from 'node:crypto';
+
+/* Import package dependencies */
+import jwt from 'jsonwebtoken';
+
+/* Import local dependencies */
+import { Users } from './model.js';
+import { LeaderBoard } from './model.js';
+
+/**
+ * @func
+ * @async
+ * @static
+ * @param  {object} req - The request object.
+ * @param  {object} res - The response object.
+ * @return {Promise}
+ * @desc   Router-level middleware function to get all users.
+ * @requires module:redis-users.Users.getUsers
+ */
+export async function getUsersMiddleware(req, res){
+
+	res.setHeader('Server', req.app.get('serverName'));
+
+	const usersObj = new Users(req.app.get('clientRd'), req.app.get('redisKeyUser'));
+
+	try{
+		let users = await usersObj.getUsers();
+		res.status(200).send(users.join(','));
+	}
+	catch(err){
+		res.status(401).send(`Authentication Error: ${err.message}`);
+	}
+}
+
+/**
+ * @func
+ * @async
+ * @static
+ * @param  {object} req - The request object.
+ * @param  {object} res - The response object.
+ * @return {Promise}
+ * @desc   Router-level middleware function to create none existing user and responds with JWT token.
+ * @requires module:redis-users.Users.createUser
+ */
+export async function createUserMiddleware(req, res){
+
+	if(!verifyCredentials(req, res)) return;
+
+	const usersObj = new Users(req.app.get('clientRd'), req.app.get('redisKeyUser'));
+
+	const user = {
+		username: req.body.username.toLowerCase(),
+		password: createHash('md5').update(req.body.password).digest('hex')
+	};
+
+	try{
+		await usersObj.createUser(user.username, user.password);
+
+		const payload = { ...user };
+		delete payload.password;
+
+		// https://www.npmjs.com/package/jsonwebtoken?activeTab=readme#jwtsignpayload-secretorprivatekey-options-callback
+		// jwt.sign(payload, secretOrPrivateKey, [options, callback])
+		const token = jwt.sign(payload, req.app.get('secretKey'), {algorithm: 'HS256'});
+
+		res.status(201).json({ token });
+	}
+	catch(err){
+		res.status(401).send(`Authentication Error: ${err.message}`);
+	}
+}
+
+/**
+ * @func
+ * @async
+ * @static
+ * @param  {object} req - The request object.
+ * @param  {object} res - The response object.
+ * @return {Promise}
+ * @desc   Router-level middleware function to update an existing user and responds with JWT token.
+ * @requires module:redis-users.Users.updateUser
+ */
+export async function updateUserMiddleware(req, res){
+
+	if(!verifyCredentials(req, res)) return;
+
+	const usersObj = new Users(req.app.get('clientRd'), req.app.get('redisKeyUser'));
+
+	const user = {
+		username: req.body.username.toLowerCase(),
+		password: createHash('md5').update(req.body.password).digest('hex')
+	};
+
+	if('newpassword' in req.body &amp;&amp; req.body.newpassword){
+		user.newpassword = createHash('md5').update(req.body.newpassword).digest('hex');
+	}
+
+	try{
+		if('newpassword' in req.body){
+			await usersObj.updateUser(user.username, user.password, user.newpassword);
+		}
+		else{
+			await usersObj.updateUser(user.username, user.password);
+		}
+
+		const payload = { ...user };
+		delete payload.password;
+		if(payload.newpassword) delete payload.newpassword;
+
+		// https://www.npmjs.com/package/jsonwebtoken?activeTab=readme#jwtsignpayload-secretorprivatekey-options-callback
+		// jwt.sign(payload, secretOrPrivateKey, [options, callback])
+		const token = jwt.sign(payload, req.app.get('secretKey'), {algorithm: 'HS256'});
+
+		res.status(201).json({ token });
+	}
+	catch(err){
+		res.status(401).send(`Authentication Error: ${err.message}`);
+	}
+}
+
+/**
+ * @func
+ * @async
+ * @static
+ * @param  {object} req - The request object.
+ * @param  {object} res - The response object.
+ * @return {Promise}
+ * @desc   Router-level middleware function to delete an existing user.
+ * @requires module:redis-users.Users.deleteUser
+ * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
+ */
+export async function deleteUserMiddleware(req, res){
+
+	if(!verifyCredentials(req, res)) return;
+
+	const redisKeyA = req.app.get('redisKeyActivity');
+	const redisKeyT = req.app.get('redisKeyTimestamp');
+
+    const leaderboardObj = new LeaderBoard(req.app.get('clientRd'), redisKeyT, redisKeyA);
+	const usersObj = new Users(req.app.get('clientRd'), req.app.get('redisKeyUser'));
+
+	const user = {
+		username: req.body.username.toLowerCase(),
+		password: createHash('md5').update(req.body.password).digest('hex')
+	};
+
+	try{
+		await usersObj.deleteUser(user.username, user.password);
+		await leaderboardObj.removeUserScore(user.username);
+
+		res.status(204).send();
+	}
+	catch(err){
+		res.status(401).send(`Authentication Error: ${err.message}`);
+	}
+}
+
+/**
+ * @func
+ * @param  {object} req - The request object.
+ * @param  {object} res - The response object.
+ * @return {boolean} True when user credentials are verified, false otherwise.
+ * @desc   Verifies the user credentials and sends non OK response otherwise.
+ */
+function verifyCredentials(req, res){
+
+	res.setHeader('Server', req.app.get('serverName'));
+
+	if(Object.keys(req.body).length === 0){
+		res.status(400).send('Authentication Error: none or invalid request payload');
+		return;
+	}
+
+	if(!('username' in req.body || 'password' in req.body)){
+		res.status(400).send('Authentication Error: no username/password given');
+		return;
+	}
+
+	if(!('username' in req.body) || !req.body.username){
+		res.status(400).send('Authentication Error: no username given');
+		return;
+	}
+
+	if(!('password' in req.body) || !req.body.password){
+		res.status(400).send('Authentication Error: no password given');
+		return;
+	}
+
+	return true;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-auth-route.html">auth-route</a></li><li><a href="module-auth-route-controller.html">auth-route-controller</a></li><li><a href="module-auth-route-model.html">auth-route-model</a></li><li><a href="module-auth-route-test.html">auth-route-test</a></li><li><a href="module-leaderboard-api.html">leaderboard-api</a></li><li><a href="module-leaderboard-route.html">leaderboard-route</a></li><li><a href="module-leaderboard-route-controller.html">leaderboard-route-controller</a></li><li><a href="module-leaderboard-route-model.html">leaderboard-route-model</a></li><li><a href="module-leaderboard-route-test.html">leaderboard-route-test</a></li><li><a href="module-redis-leaderboard.html">redis-leaderboard</a></li><li><a href="module-redis-leaderboard-test.html">redis-leaderboard-test</a></li><li><a href="module-redis-users.html">redis-users</a></li><li><a href="module-redis-users-test.html">redis-users-test</a></li><li><a href="module-score-route.html">score-route</a></li><li><a href="module-score-route-controller.html">score-route-controller</a></li><li><a href="module-score-route-model.html">score-route-model</a></li><li><a href="module-score-route-test.html">score-route-test</a></li><li><a href="module-test-data.html">test-data</a></li></ul><h3>Classes</h3><ul><li><a href="module-redis-leaderboard.LeaderBoard.html">LeaderBoard</a></li><li><a href="module-redis-users.Users.html">Users</a></li><li><a href="module-test-data.TestData.html">TestData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Apr 22 2025 06:51:10 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

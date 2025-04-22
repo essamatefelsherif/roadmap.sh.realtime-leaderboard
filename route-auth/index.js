@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-auth-route
+ * @module  auth-route
  * @desc    The leaderboard-api authentication route module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
@@ -23,15 +23,15 @@ import {
 const router = Router();
 
 /*
- * ======================================================================================================
- * Endpoint  Method  Auth  Payload                                                Router-level middleware
- * ======================================================================================================
- * /auth     GET     No                                                           getUsersMiddleware
- * /auth     POST    No    {username:'xxx', password: 'yyy'}                      createUserMiddleware
- * /auth     PUT     No    {username:'xxx', password: 'yyy'}                      updateUserMiddleware
- * /auth     PUT     No    {username:'xxx', password: 'yyy', newpassword: 'zzz'}  updateUserMiddleware
- * /auth     PATCH   No    {username:'xxx', password: 'yyy'}                      deleteUserMiddleware
- * ======================================================================================================
+ * =========================================================================================================
+ * Endpoint     Method  Auth  Payload                                                Router-level middleware
+ * =========================================================================================================
+ * .../auth     GET     No                                                           getUsersMiddleware
+ * .../auth     POST    No    {username:'xxx', password: 'yyy'}                      createUserMiddleware
+ * .../auth     PUT     No    {username:'xxx', password: 'yyy'}                      updateUserMiddleware
+ * .../auth     PUT     No    {username:'xxx', password: 'yyy', newpassword: 'zzz'}  updateUserMiddleware
+ * .../auth     PATCH   No    {username:'xxx', password: 'yyy'}                      deleteUserMiddleware
+ * =========================================================================================================
  */
 
 /* Endpoint: /auth Method: GET */

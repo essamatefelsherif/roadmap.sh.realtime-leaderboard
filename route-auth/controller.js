@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-auth-controller
+ * @module  auth-route-controller
  * @desc    The leaderboard-api authentication controller module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
@@ -23,7 +23,7 @@ import { LeaderBoard } from './model.js';
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to get all users.
- * @requires module:leaderboard-api-redis-users.Users.getUsers
+ * @requires module:redis-users.Users.getUsers
  */
 export async function getUsersMiddleware(req, res){
 
@@ -48,7 +48,7 @@ export async function getUsersMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to create none existing user and responds with JWT token.
- * @requires module:leaderboard-api-redis-users.Users.createUser
+ * @requires module:redis-users.Users.createUser
  */
 export async function createUserMiddleware(req, res){
 
@@ -86,7 +86,7 @@ export async function createUserMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to update an existing user and responds with JWT token.
- * @requires module:leaderboard-api-redis-users.Users.updateUser
+ * @requires module:redis-users.Users.updateUser
  */
 export async function updateUserMiddleware(req, res){
 
@@ -134,8 +134,8 @@ export async function updateUserMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to delete an existing user.
- * @requires module:leaderboard-api-redis-users.Users.deleteUser
- * @requires module:leaderboard-api-redis.LeaderBoard.removeUserScore
+ * @requires module:redis-users.Users.deleteUser
+ * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
  */
 export async function deleteUserMiddleware(req, res){
 

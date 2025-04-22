@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-score-controller
+ * @module  score-route-controller
  * @desc    The leaderboard-api score controller module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
@@ -43,7 +43,7 @@ export async function getUserActMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to create a user activity.
- * @requires module:leaderboard-api-redis.LeaderBoard.addUserScore
+ * @requires module:redis-leaderboard.LeaderBoard.addUserScore
  */
 export async function createUserActMiddleware(req, res){
 
@@ -91,7 +91,7 @@ export async function createUserActMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to delete a user activity.
- * @requires module:leaderboard-api-redis.LeaderBoard.removeUserScore
+ * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
  */
 export async function deleteUserActMiddleware(req, res){
 
@@ -129,7 +129,7 @@ export async function deleteUserActMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function to delete all user activities.
- * @requires module:leaderboard-api-redis.LeaderBoard.removeUserScore
+ * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
  */
 export async function deleteUserMiddleware(req, res){
 

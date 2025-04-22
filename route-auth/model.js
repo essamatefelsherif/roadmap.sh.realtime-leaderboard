@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-auth-model
+ * @module  auth-route-model
  * @desc    The leaderboard-api authentication model module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif

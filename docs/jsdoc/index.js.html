@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module  leaderboard-api
+ * @desc    The leaderboard-api main module.
+ * @version 1.0.0
+ * @author  Essam A. El-Sherif
+ */
+
+/* Import node.js core modules */
+import fs                from 'node:fs';
+import http              from 'node:http';
+import https             from 'node:https';
+import process           from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+/* Import package dependencies */
+import express from 'express';
+import morgan  from 'morgan';
+import dotenv  from 'dotenv';
+import redis   from 'redis';
+
+/**
+ * @func  expressjwt
+ * @param {object} options
+ * @desc  Third-party middleware function.
+ */
+import { expressjwt } from 'express-jwt';
+
+/**
+ * @const {object} authRouter - Authentication router object.
+ * @see   module:auth-route.router
+ */
+import { router as authRouter } from './route-auth/index.js';
+
+/**
+ * @const {object} scoreRouter - Score router object.
+ * @see   module:score-route.router
+ */
+import { router as scoreRouter } from './route-score/index.js';
+
+/**
+ * @const {object} leaderboardRouter - Leaderboard router object.
+ * @see   module:leaderboard-route.router
+ */
+import { router as leaderboardRouter } from './route-leaderboard/index.js';
+
+/* Emulate commonJS __filename and __dirname constants */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = dirname(__filename);
+
+/* Configure dotenv path to read the package .env file */
+dotenv.config({path: join(__dirname, './.env')});
+
+/** @const {object} appOptions - The application options. */
+const appOptions = {
+	serverProt: process.env.lb_serverProtocol,
+	serverCert: process.env.lb_serverCert,
+	serverKey : process.env.lb_serverKey,
+	serverHost: process.env.lb_serverHost,
+	serverPort: process.env.lb_serverPort,
+	serverPath: process.env.lb_serverPath,
+	secretKey : process.env.lb_secretKey,
+	connectRd : process.env.lb_connectRedis,
+	serverName: `${process.env.lb_serverName} (${process.platform}) NodeJS/${process.version.substring(1)}`,
+	verbose: true,
+};
+
+/**
+ * @const {object} app - The express app object.
+ * @desc  The express app object conventionally denotes the express application.
+ */
+const app = express();
+
+/* Application built-in settings */
+app.set('x-powered-by', false);
+app.set('etag', false);
+
+/* Application User-defined settings */
+app.set('serverName', appOptions.serverName);
+app.set('secretKey',  appOptions.secretKey);
+
+app.set('redisKeyUser',     'lb:user:');
+app.set('redisKeyActivity', 'lb:act:');
+app.set('redisKeyTimestamp','lb:ts:');
+
+/*
+ * Use morgan() third-party middleware function
+ * for logging HTTP requests, only if verbose is true.
+ */
+appOptions.verbose &amp;&amp; app.use(morgan('common', { immediate: true }));
+
+/*
+ * Use express.json() built-in middleware function
+ * for parsing incoming requests with JSON payloads.
+ */
+app.use(express.json());
+
+/* Endpoint: .../  Method: GET */
+app.get(`${appOptions.serverPath}`, (req, res) => {
+
+	let resBody = '';
+	resBody += `${appOptions.serverHost}:${appOptions.serverPort}\n`;
+	resBody += `${req.app.get('serverName')}\n`;
+
+	res.setHeader('Server', req.app.get('serverName'));
+	res.status(200).send(resBody);
+});
+
+/* Endpoint: .../auth */
+app.use(`${appOptions.serverPath}/auth`, authRouter);
+
+/* Endpoint: .../score */
+app.use(`${appOptions.serverPath}/score`, expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), scoreRouter);
+
+/* Endpoint: .../leaderboard */
+app.use(`${appOptions.serverPath}/leaderboard`, expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), leaderboardRouter);
+
+/* Error Handling */
+app.use((err, req, res, next) => {
+
+	if(err.name === 'UnauthorizedError'){
+		res.status(401).send(`Authorization Error: ${err.message}`);
+	}
+	else{
+		next();
+	}
+});
+
+/*
+ * https://github.com/redis/node-redis
+ *
+ * Connect to Redis and attach a node-redis Client instance to app.
+ * Create a node-redis Client instance, or throws on failure.
+ */
+try{
+	app.set('clientRd',
+		redis.createClient({
+			url: appOptions.connectRd,
+			name: 'leaderboard-api'
+		})
+		.on('error', (err) => {
+    		console.error(err.message);
+    		process.exit(1);
+		})
+	);
+
+	/*
+ 	 * Since v4 of node-redis, the client does not automatically connect to the server.
+	 * Instead you need to run .connect() after creating the client or you will receive an error.
+	 */
+	await app.get('clientRd').connect();
+
+	appOptions.verbose &amp;&amp; console.log(`... Redis database server is connected`);
+}
+catch(err){
+	console.error(err.message);
+	process.exit(1);
+}
+
+/* Start the application server */
+
+let serverOptions = {};
+let serverModule = http;
+
+if(appOptions.serverProt === 'https'){
+
+	try{
+		serverOptions.key  = fs.readFileSync(join(__dirname, appOptions.serverKey));
+		serverOptions.cert = fs.readFileSync(join(__dirname, appOptions.serverCert));
+
+		serverModule = https;
+	}
+	catch(err){
+		appOptions.serverProt = 'http';
+		serverModule = http;
+	}
+}
+
+/** @const {object} server - The http/https server object. */
+const server = serverModule.createServer(serverOptions, app)
+
+	.listen(appOptions.serverPort, appOptions.serverHost, () => {
+
+		const {port, address:host} = server.address();
+
+		appOptions.verbose &amp;&amp; console.log(
+			`... leaderboard-api server is listening to ${appOptions.serverProt}://${host}:${port}`
+		);
+		appOptions.verbose &amp;&amp; console.log(
+			'... Press CTRL-C to terminate'
+		);
+		appOptions.verbose &amp;&amp; console.log();
+	})
+	.on('error', (err) => {
+		appOptions.verbose &amp;&amp; console.error(err.code, err.message);
+	});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-auth-route.html">auth-route</a></li><li><a href="module-auth-route-controller.html">auth-route-controller</a></li><li><a href="module-auth-route-model.html">auth-route-model</a></li><li><a href="module-auth-route-test.html">auth-route-test</a></li><li><a href="module-leaderboard-api.html">leaderboard-api</a></li><li><a href="module-leaderboard-route.html">leaderboard-route</a></li><li><a href="module-leaderboard-route-controller.html">leaderboard-route-controller</a></li><li><a href="module-leaderboard-route-model.html">leaderboard-route-model</a></li><li><a href="module-leaderboard-route-test.html">leaderboard-route-test</a></li><li><a href="module-redis-leaderboard.html">redis-leaderboard</a></li><li><a href="module-redis-leaderboard-test.html">redis-leaderboard-test</a></li><li><a href="module-redis-users.html">redis-users</a></li><li><a href="module-redis-users-test.html">redis-users-test</a></li><li><a href="module-score-route.html">score-route</a></li><li><a href="module-score-route-controller.html">score-route-controller</a></li><li><a href="module-score-route-model.html">score-route-model</a></li><li><a href="module-score-route-test.html">score-route-test</a></li><li><a href="module-test-data.html">test-data</a></li></ul><h3>Classes</h3><ul><li><a href="module-redis-leaderboard.LeaderBoard.html">LeaderBoard</a></li><li><a href="module-redis-users.Users.html">Users</a></li><li><a href="module-test-data.TestData.html">TestData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Apr 22 2025 06:51:10 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-leaderboard-model
+ * @module  leaderboard-route-model
  * @desc    The leaderboard-api leaderboard model module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif

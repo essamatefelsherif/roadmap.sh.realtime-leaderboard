@@ -1,46 +1,46 @@
 /**
- * @module  leaderboard-api-score-route-test
+ * @module  score-route-test
  * @desc    The leaderboard-api score route testing module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
  */
 
 /* Import node.js core modules */
-import assert from 'node:assert/strict';
-import http from 'node:http';
+import assert            from 'node:assert/strict';
+import fs                from 'node:fs';
+import http              from 'node:http';
+import https             from 'node:https';
+import runner            from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+/* Import package dependencies */
+import dotenv from 'dotenv';
+
 /* Import local dependencies */
 import { TestData } from './test-data.js';
-import dotenv from 'dotenv';
 
 /* Emulate commonJS __filename and __dirname constants */
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname  = dirname(__filename);
 
 /* Configure dotenv path to read the package .env file */
 dotenv.config({path: join(__dirname, '../.env')});
 
-/** @const {object} cmdOptions - Options used when running the tests. */
-const cmdOptions = {
-    node    : true,
-    verbose : true,
-};
-
 /* Prepare test environment */
-
-let testCount   = 1;
-let passCount   = 0;
-let failCount   = 0;
-let cancelCount = 0;
-let skipCount   = 0;
-let todoCount   = 0;
-let startTime = Date.now();
-
 const suites = new Map();
 
-const baseUrl = `http://${process.env.lb_serverHost}:${process.env.lb_serverPort}/score`;
+const url = new URL('http://server');
+
+url.host = process.env.lb_serverHost;
+url.port = process.env.lb_serverPort;
+url.pathname = process.env.lb_serverPath;
+
+if(process.env.lb_serverProtocol === 'https'){
+	url.protocol = 'https';
+}
+const baseUrl = `${url.href}/score`;
+
 let testUsers = null;
 
 /**
@@ -52,29 +52,15 @@ let testUsers = null;
 	const testData = new TestData();
 	testUsers = testData.testUsers;
 
-	await Promise.all(testData.unregisterTestUsers());
-	await Promise.all(testData.registerTestUsers());
+	await testData.unregisterTestUsers();
+	await testData.registerTestUsers();
 
 	loadTestData();
 
-	if(cmdOptions.node){
-		import('node:test')
-			.then(runner => {
-				cmdOptions.verbose = false;
-				runner.after(async() => {
-					await Promise.all(testData.unregisterTestUsers());
-				});
-				nodeRunner(runner);
-			})  /* node:coverage disable */
-			.catch(async(e) => {
-				defRunner();
-				await Promise.all(testData.unregisterTestUsers());
-			});
-	}
-	else{
-		defRunner();
-		await Promise.all(testData.unregisterTestUsers());
-	}   /* node:coverage enable */
+	runner.after(async() => {
+		await testData.unregisterTestUsers();
+	});
+	nodeRunner(runner);
 
 })('Main Function');
 
@@ -202,11 +188,11 @@ function loadTestData(){
 		reqAuth: testUsers[0].token,
 		reqBody: {activity: 'activity-1', score: 100},
 		resCode: 201,
-		resBody: {activity: 'activity-1', score: 100, username: testUsers[0].username},
+		resBody: {activity: 'activity-1', username: testUsers[0].username, score: '100'},
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity valid ... test#1';
+	testData.desc = 'Test createUserActivity   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
@@ -219,11 +205,11 @@ function loadTestData(){
 		reqAuth: testUsers[0].token,
 		reqBody: {activity: 'activity-1', score: 200},
 		resCode: 201,
-		resBody: {activity: 'activity-1', score: 200, username: testUsers[0].username},
+		resBody: {activity: 'activity-1', username: testUsers[0].username, score: '200'},
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity valid ... test#2';
+	testData.desc = 'Test createUserActivity   valid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
@@ -236,17 +222,14 @@ function loadTestData(){
 		reqAuth: testUsers[1].token,
 		reqBody: {activity: 'activity-1', score: 300},
 		resCode: 201,
-		resBody: {activity: 'activity-1', score: 300, username: testUsers[1].username},
+		resBody: {activity: 'activity-1', username: testUsers[1].username, score: '300'},
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity valid ... test#3';
+	testData.desc = 'Test createUserActivity   valid ... test#3';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
-
-
-
 
 	// TEST SUITE ### - Test Score Route - deleteUserActivity
 	suiteDesc = 'Test Score Route - deleteUserActivity';
@@ -349,15 +332,10 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity valid ... test#1';
+	testData.desc = 'Test deleteUserActivity   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
-
-
-
-
-
 
 	// TEST SUITE ### - Test Score Route - deleteUser
 	suiteDesc = 'Test Score Route - deleteUser';
@@ -392,7 +370,7 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUser valid ... test#1';
+	testData.desc = 'Test deleteUser   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
@@ -409,7 +387,7 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUser valid ... test#2';
+	testData.desc = 'Test deleteUser   valid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
@@ -426,80 +404,11 @@ function nodeRunner(runner){
 		runner.suite(suiteDesc, () => {
 			for(let cmdObj of suiteTests){
 				runner.test(cmdObj.desc, {skip: cmdObj.skip}, async () => {
-					await makeTest(cmdObj);
+					await cmdObj.method();
 				});
 			}
 		});
 	}
-}
-/* node:coverage disable */
-
-/**
- * @func  defRunner
- * @desc  Carry out the loaded tests using this developed test runner.
- */
-function defRunner(){
-
-	cmdOptions.verbose && process.on('exit', () => {
-		console.log();
-		console.log('▶ tests',    -- testCount);
-		console.log('▶ suites',      suites.size);
-		console.log('▶ pass',        passCount);
-		console.log('▶ fail',        failCount);
-		console.log('▶ cancelled',   cancelCount);
-		console.log('▶ skipped',     skipCount);
-		console.log('▶ todo',        todoCount);
-		console.log('▶ duration_ms', Math.round(Date.now() - startTime));
-	});
-
-	cmdOptions.verbose && console.error();
-	for(let [suiteDesc, suiteTests] of suites)
-		for(let cmdObj of suiteTests){
-			if(!cmdObj.skip){
-				(async() => {
-					await makeTest(cmdObj);
-				})();
-			}
-		}
-
-	cmdOptions.verbose && console.log();
-}
-/* node:coverage enable */
-
-/**
- * @func
- * @async
- * @param {object} obj - The test data object.
- * @desc  Carry out a single test.
- */
-async function makeTest(obj){
-
-	const testID = testCount++;
-
-	let preMsg = `Test#${(testID).toString().padStart(3, '0')} ... `;
-	let postMsg = preMsg;
-
-	preMsg += `Initiate ... ${obj.desc}`;
-	cmdOptions.verbose && console.error(preMsg);
-
-	if(!cmdOptions.verbose){
-		await obj.method();
-	}   /* node:coverage disable */
-	else{
-		try{
-			await obj.method();
-			passCount++;
-
-			postMsg += `Success  ... ${obj.desc}`;
-			cmdOptions.verbose && console.error(postMsg);
-		}
-		catch(e){
-			failCount++;
-
-			postMsg += `Failure  ... ${obj.desc}`;
-			cmdOptions.verbose && console.error(postMsg);
-		}
-	}   /* node:coverage enable */
 }
 
 /**
@@ -510,7 +419,15 @@ async function makeTest(obj){
 async function testMethod(){
 	await new Promise((resolve, reject) => {
 
-		const cr = http.request(baseUrl, {method: this.reqMethod}, (res) => {
+		let module = http;
+		let reqOptions = { method: this.reqMethod };
+
+		if(new URL(baseUrl).protocol === 'https:'){
+			module = https;
+			reqOptions.rejectUnauthorized = false;
+		}
+
+		const cr = module.request(baseUrl, reqOptions, (res) => {
 			let body = '';
 			res.on('data', (chunk) => {
 				body += chunk;

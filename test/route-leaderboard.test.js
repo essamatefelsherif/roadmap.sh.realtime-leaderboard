@@ -1,46 +1,46 @@
 /**
- * @module  leaderboard-api-leaderboard-route-test
+ * @module  leaderboard-route-test
  * @desc    The leaderboard-api leaderboard route testing module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
  */
 
 /* Import node.js core modules */
-import assert from 'node:assert/strict';
-import http from 'node:http';
+import assert            from 'node:assert/strict';
+import fs                from 'node:fs';
+import http              from 'node:http';
+import https             from 'node:https';
+import runner            from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+/* Import package dependencies */
+import dotenv from 'dotenv';
+
 /* Import local dependencies */
 import { TestData } from './test-data.js';
-import dotenv from 'dotenv';
 
 /* Emulate commonJS __filename and __dirname constants */
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname  = dirname(__filename);
 
 /* Configure dotenv path to read the package .env file */
 dotenv.config({path: join(__dirname, '../.env')});
 
-/** @const {object} cmdOptions - Options used when running the tests. */
-const cmdOptions = {
-    node    : true,
-    verbose : true,
-};
-
 /* Prepare test environment */
-
-let testCount   = 1;
-let passCount   = 0;
-let failCount   = 0;
-let cancelCount = 0;
-let skipCount   = 0;
-let todoCount   = 0;
-let startTime = Date.now();
-
 const suites = new Map();
 
-const baseUrl = `http://${process.env.lb_serverHost}:${process.env.lb_serverPort}/leaderboard/`;
+const url = new URL('http://server');
+
+url.host = process.env.lb_serverHost;
+url.port = process.env.lb_serverPort;
+url.pathname = process.env.lb_serverPath;
+
+if(process.env.lb_serverProtocol === 'https'){
+	url.protocol = 'https';
+}
+const baseUrl = `${url.href}/leaderboard`;
+
 let testUsers = null;
 
 /**
@@ -49,32 +49,19 @@ let testUsers = null;
  * @desc The module entry point function.
  */
 (async () => {
-	const testData = new TestData();
+	const testData = new TestData(3, 3, false);
 	testUsers = testData.testUsers;
 
-	await Promise.all(testData.unregisterTestUsers());
-	await Promise.all(testData.registerTestUsers());
+	await testData.unregisterTestUsers();
+	await testData.registerTestUsers();
+	await testData.registerTestActivities();
 
 	loadTestData();
 
-	if(cmdOptions.node){
-		import('node:test')
-			.then(runner => {
-				cmdOptions.verbose = false;
-				runner.after(async() => {
-					await Promise.all(testData.unregisterTestUsers());
-				});
-				nodeRunner(runner);
-			})  /* node:coverage disable */
-			.catch(async(e) => {
-				defRunner();
-				await Promise.all(testData.unregisterTestUsers());
-			});
-	}
-	else{
-		defRunner();
-		await Promise.all(testData.unregisterTestUsers());
-	}   /* node:coverage enable */
+	runner.after(async() => {
+		await testData.unregisterTestUsers();
+	});
+	nodeRunner(runner);
 
 })('Main Function');
 
@@ -88,24 +75,464 @@ function loadTestData(){
 	let suiteDesc = '';
 	let testObj = null;
 
-	// TEST SUITE ### - Test Leaderboard Route - createUserActivity
-	suiteDesc = 'Test Leaderboard Route - createUserActivity';
+	// TEST SUITE ### - Test Leaderboard Route - Endpoint /global
+	suiteDesc = 'Test Leaderboard Route - Endpoint /global';
 	suites.set(suiteDesc, []);
 
-	// TEST ### - Test createUserActivity invalid ... test#1
+	// TEST ### - Test endpoint /global invalid ... test#1
 	testData = {};
 
 	testObj = {
-		reqUrl : `${baseUrl}`;
+		reqUrl : `${baseUrl}/global`,
 		reqMethod: 'GET',
 		reqAuth: undefined,
-		reqBody: undefined,
 		resCode: 401,
 		resBody: 'Authorization Error: No authorization token was found',
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#1';
+	testData.desc = 'Test endpoint /global             invalid ... test#1';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global valid ... test#2
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-3', username: 'user@3', score: '330', rank: 1 },
+			{ activity: 'activity-3', username: 'user@2', score: '320', rank: 2 },
+			{ activity: 'activity-3', username: 'user@1', score: '310', rank: 3 },
+			{ activity: 'activity-2', username: 'user@3', score: '230', rank: 4 },
+			{ activity: 'activity-2', username: 'user@2', score: '220', rank: 5 },
+			{ activity: 'activity-2', username: 'user@1', score: '210', rank: 6 },
+			{ activity: 'activity-1', username: 'user@3', score: '130', rank: 7 },
+			{ activity: 'activity-1', username: 'user@2', score: '120', rank: 8 },
+			{ activity: 'activity-1', username: 'user@1', score: '110', rank: 9 }
+		]
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global               valid ... test#2';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/top valid ... test#3
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/top`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-3', username: 'user@3', score: '330', rank: 1 },
+			{ activity: 'activity-3', username: 'user@2', score: '320', rank: 2 },
+			{ activity: 'activity-3', username: 'user@1', score: '310', rank: 3 },
+			{ activity: 'activity-2', username: 'user@3', score: '230', rank: 4 },
+			{ activity: 'activity-2', username: 'user@2', score: '220', rank: 5 },
+		]
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/top           valid ... test#3';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/top/0 invalid ... test#4
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/top/0`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/top/0       invalid ... test#4';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/top/x0 invalid ... test#5
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/top/x0`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/top/x0      invalid ... test#5';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/top/3.5 invalid ... test#6
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/top/3.5`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/top/3.5     invalid ... test#6';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/top/5 valid ... test#7
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/top/5`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-3', username: 'user@3', score: '330', rank: 1 },
+			{ activity: 'activity-3', username: 'user@2', score: '320', rank: 2 },
+			{ activity: 'activity-3', username: 'user@1', score: '310', rank: 3 },
+			{ activity: 'activity-2', username: 'user@3', score: '230', rank: 4 },
+			{ activity: 'activity-2', username: 'user@2', score: '220', rank: 5 },
+		]
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/top/5         valid ... test#7';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/user invalid ... test#8
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/user`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: 'Retrieval Error: invalid endpoint'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/user        invalid ... test#8';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/user/xxx valid ... test#9
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/user/xxx`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: []
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/user/xxx      valid ... test#9';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/user/user@1 valid ... test#10
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/user/user@1`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-3', username: 'user@1', score: '310', rank: 1 },
+			{ activity: 'activity-2', username: 'user@1', score: '210', rank: 2 },
+			{ activity: 'activity-1', username: 'user@1', score: '110', rank: 3 }
+		]
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/user/user@1   valid ... test#10';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/xxx invalid ... test#11
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/xxx`,
+		reqMethod: 'POST',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: `Retrieval Error: invalid request method 'POST'`
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/xxx           invalid ... test#11';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /global/xxx invalid ... test#12
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/global/xxx`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: `Retrieval Error: invalid endpoint`
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /global/xxx           invalid ... test#12';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+
+
+
+
+
+
+
+
+
+	// TEST SUITE ### - Test Leaderboard Route - Endpoint /:activity
+	suiteDesc = 'Test Leaderboard Route - Endpoint /:activity';
+	suites.set(suiteDesc, []);
+
+	// TEST ### - Test endpoint /activity-1 invalid ... test#1
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1`,
+		reqMethod: 'GET',
+		reqAuth: undefined,
+		resCode: 401,
+		resBody: 'Authorization Error: No authorization token was found',
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1             invalid ... test#1';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1 valid ... test#2
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-1', username: 'user@3', score: '130', rank: 1 },
+			{ activity: 'activity-1', username: 'user@2', score: '120', rank: 2 },
+			{ activity: 'activity-1', username: 'user@1', score: '110', rank: 3 }
+		],
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1               valid ... test#2';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/top valid ... test#3
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/top`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-1', username: 'user@3', score: '130', rank: 1 },
+			{ activity: 'activity-1', username: 'user@2', score: '120', rank: 2 },
+			{ activity: 'activity-1', username: 'user@1', score: '110', rank: 3 }
+		],
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/top           valid ... test#3';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/top/0 invalid ... test#4
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/top/0`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/top/0       invalid ... test#4';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/top/x0 invalid ... test#5
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/top/x0`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/top/x0      invalid ... test#5';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/top/3.5 invalid ... test#6
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/top/3.5`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 400,
+		resBody: 'Retrieval Error: invalid top count'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/top/3.5     invalid ... test#6';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/top/2 valid ... test#7
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/top/2`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: [
+			{ activity: 'activity-1', username: 'user@3', score: '130', rank: 1 },
+			{ activity: 'activity-1', username: 'user@2', score: '120', rank: 2 },
+		]
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/top/2         valid ... test#7';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/user invalid ... test#8
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/user`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: 'Retrieval Error: invalid endpoint'
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/user        invalid ... test#8';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/user/xxx valid ... test#9
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/user/xxx`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: {}
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/user/xxx      valid ... test#9';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/user/user@1 valid ... test#10
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/user/user@1`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 200,
+		resBody: { activity: 'activity-1', username: 'user@1', score: '110', rank: 3}
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/user/user@1   valid ... test#10';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/xxx invalid ... test#11
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/xxx`,
+		reqMethod: 'POST',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: `Retrieval Error: invalid request method 'POST'`
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/xxx         invalid ... test#11';
+
+	testData.skip = false;
+	suites.get(suiteDesc).push(testData);
+
+	// TEST ### - Test endpoint /activity-1/xxx invalid ... test#12
+	testData = {};
+
+	testObj = {
+		reqUrl : `${baseUrl}/activity-1/xxx`,
+		reqMethod: 'GET',
+		reqAuth: testUsers[0].token,
+		resCode: 404,
+		resBody: `Retrieval Error: invalid endpoint`
+	};
+
+	testData.method = testMethod.bind(testObj);
+	testData.desc = 'Test endpoint /activity-1/xxx         invalid ... test#12';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
@@ -122,80 +549,11 @@ function nodeRunner(runner){
 		runner.suite(suiteDesc, () => {
 			for(let cmdObj of suiteTests){
 				runner.test(cmdObj.desc, {skip: cmdObj.skip}, async () => {
-					await makeTest(cmdObj);
+					await cmdObj.method();
 				});
 			}
 		});
 	}
-}
-/* node:coverage disable */
-
-/**
- * @func  defRunner
- * @desc  Carry out the loaded tests using this developed test runner.
- */
-function defRunner(){
-
-	cmdOptions.verbose && process.on('exit', () => {
-		console.log();
-		console.log('▶ tests',    -- testCount);
-		console.log('▶ suites',      suites.size);
-		console.log('▶ pass',        passCount);
-		console.log('▶ fail',        failCount);
-		console.log('▶ cancelled',   cancelCount);
-		console.log('▶ skipped',     skipCount);
-		console.log('▶ todo',        todoCount);
-		console.log('▶ duration_ms', Math.round(Date.now() - startTime));
-	});
-
-	cmdOptions.verbose && console.error();
-	for(let [suiteDesc, suiteTests] of suites)
-		for(let cmdObj of suiteTests){
-			if(!cmdObj.skip){
-				(async() => {
-					await makeTest(cmdObj);
-				})();
-			}
-		}
-
-	cmdOptions.verbose && console.log();
-}
-/* node:coverage enable */
-
-/**
- * @func
- * @async
- * @param {object} obj - The test data object.
- * @desc  Carry out a single test.
- */
-async function makeTest(obj){
-
-	const testID = testCount++;
-
-	let preMsg = `Test#${(testID).toString().padStart(3, '0')} ... `;
-	let postMsg = preMsg;
-
-	preMsg += `Initiate ... ${obj.desc}`;
-	cmdOptions.verbose && console.error(preMsg);
-
-	if(!cmdOptions.verbose){
-		await obj.method();
-	}   /* node:coverage disable */
-	else{
-		try{
-			await obj.method();
-			passCount++;
-
-			postMsg += `Success  ... ${obj.desc}`;
-			cmdOptions.verbose && console.error(postMsg);
-		}
-		catch(e){
-			failCount++;
-
-			postMsg += `Failure  ... ${obj.desc}`;
-			cmdOptions.verbose && console.error(postMsg);
-		}
-	}   /* node:coverage enable */
 }
 
 /**
@@ -206,7 +564,15 @@ async function makeTest(obj){
 async function testMethod(){
 	await new Promise((resolve, reject) => {
 
-		const cr = http.request(this.reqUrl, {method: this.reqMethod}, (res) => {
+		let module = http;
+		let reqOptions = { method: this.reqMethod };
+
+		if(new URL(this.reqUrl).protocol === 'https:'){
+			module = https;
+			reqOptions.rejectUnauthorized = false;
+		}
+
+		const cr = module.request(this.reqUrl, reqOptions, (res) => {
 			let body = '';
 			res.on('data', (chunk) => {
 				body += chunk;
@@ -216,17 +582,15 @@ async function testMethod(){
 				try{
 					assert.strictEqual(res.statusCode, this.resCode);
 
-					if(this.reqMethod.toUpperCase() !== 'GET'){
-						if(typeof this.resBody === 'string'){
-							assert.strictEqual(body, this.resBody);
-						}
-						else
-						if(typeof this.resBody === 'object'){
-							assert.deepStrictEqual(
-								JSON.parse(body, (key, value) => key !== 'timestamp' ? value : undefined),
-								this.resBody
-							);
-						}
+					if(typeof this.resBody === 'string'){
+						assert.strictEqual(body, this.resBody);
+					}
+					else
+					if(typeof this.resBody === 'object'){
+						assert.deepStrictEqual(
+							JSON.parse(body, (key, value) => key !== 'timestamp' ? value : undefined),
+							this.resBody
+						);
 					}
 					resolve();
 				}
@@ -238,17 +602,6 @@ async function testMethod(){
 
 		if(this.reqAuth){
 			cr.setHeader('Authorization', `Bearer ${this.reqAuth}`);
-		}
-
-		if(typeof this.reqBody === 'object'){
-			this.reqBody = JSON.stringify(this.reqBody);
-			cr.setHeader('Content-Type', 'application/json; charset=UTF-8');
-			cr.write(this.reqBody);
-		}
-		else
-		if(typeof this.reqBody === 'string'){
-			cr.setHeader('Content-Type', 'text/plain; charset=UTF-8');
-			cr.write(this.reqBody);
 		}
 		cr.end();
 	});

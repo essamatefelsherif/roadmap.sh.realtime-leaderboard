@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-leaderboard-controller
+ * @module  leaderboard-route-controller
  * @desc    The leaderboard-api leaderboard controller module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
@@ -16,7 +16,7 @@ import { LeaderBoard } from './model.js';
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/:activity.
- * @requires module:leaderboard-api-redis.LeaderBoard.getActivity
+ * @requires module:redis-leaderboard.LeaderBoard.getActivity
  */
 export async function getActAllMiddleware(req, res){
 
@@ -44,7 +44,7 @@ export async function getActAllMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/:activity/top[/:count].
- * @requires module:leaderboard-api-redis.LeaderBoard.getActivityTopUsers
+ * @requires module:redis-leaderboard.LeaderBoard.getActivityTopUsers
  */
 export async function getActTopMiddleware(req, res){
 
@@ -52,15 +52,11 @@ export async function getActTopMiddleware(req, res){
 
 	let topCount = 5;
 	if('count' in req.params){
-		let parsedCount = parseInt(req.params.count, 10);
-
-		if(Number.isNaN(parsedCount) || parsedCount <= 0){
+		if(!(/^\d+$/.test(req.params.count) && Number(req.params.count))){
 			res.status(400).send(`Retrieval Error: invalid top count`);
 			return;
 		}
-		else{
-			topCount = parsedCount;
-		}
+		topCount = parseInt(req.params.count, 10);
 	}
 
 	const redisKeyA = req.app.get('redisKeyActivity');
@@ -86,7 +82,7 @@ export async function getActTopMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/:activity/user/:username.
- * @requires module:leaderboard-api-redis.LeaderBoard.getUserScoreAndRank
+ * @requires module:redis-leaderboard.LeaderBoard.getUserScoreAndRank
  */
 export async function getActUsrMiddleware(req, res){
 
@@ -114,7 +110,7 @@ export async function getActUsrMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/global.
- * @requires module:leaderboard-api-redis.LeaderBoard.getActivities
+ * @requires module:redis-leaderboard.LeaderBoard.getActivities
  */
 export async function getAllMiddleware(req, res){
 
@@ -142,7 +138,7 @@ export async function getAllMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/global/top[/:count].
- * @requires module:leaderboard-api-redis.LeaderBoard.getActivities
+ * @requires module:redis-leaderboard.LeaderBoard.getActivities
  */
 export async function getTopMiddleware(req, res){
 
@@ -150,15 +146,11 @@ export async function getTopMiddleware(req, res){
 
 	let topCount = 5;
 	if('count' in req.params){
-		let parsedCount = parseInt(req.params.count, 10);
-
-		if(Number.isNaN(parsedCount) || parsedCount <= 0){
+		if(!(/^\d+$/.test(req.params.count) && Number(req.params.count))){
 			res.status(400).send(`Retrieval Error: invalid top count`);
 			return;
 		}
-		else{
-			topCount = parsedCount;
-		}
+		topCount = parseInt(req.params.count, 10);
 	}
 
 	const redisKeyA = req.app.get('redisKeyActivity');
@@ -167,7 +159,7 @@ export async function getTopMiddleware(req, res){
 	const leaderboardObj = new LeaderBoard(req.app.get('clientRd'), redisKeyT, redisKeyA);
 
 	try{
-		let activities = await leaderboardObj.getActivities().slice(0, topCount);
+		let activities = (await leaderboardObj.getActivities()).slice(0, topCount);
 		res.status(200).send(activities);
 	}
 	catch(err){
@@ -183,7 +175,7 @@ export async function getTopMiddleware(req, res){
  * @param  {object} res - The response object.
  * @return {Promise}
  * @desc   Router-level middleware function for the endpoint /leaderboard/global/user/:username.
- * @requires module:leaderboard-api-redis.LeaderBoard.getUserActivities
+ * @requires module:redis-leaderboard.LeaderBoard.getUserActivities
  */
 export async function getUsrMiddleware(req, res){
 

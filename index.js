@@ -6,43 +6,59 @@
  */
 
 /* Import node.js core modules */
-import process from 'node:process';
+import fs                from 'node:fs';
+import http              from 'node:http';
+import https             from 'node:https';
+import process           from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 /* Import package dependencies */
 import express from 'express';
 import morgan  from 'morgan';
-import dotenv  from 'dotenv/config';
+import dotenv  from 'dotenv';
 import redis   from 'redis';
 
 /**
  * @func  expressjwt
  * @param {object} options
- * @desc  third-party middleware function.
+ * @desc  Third-party middleware function.
  */
 import { expressjwt } from 'express-jwt';
 
 /**
  * @const {object} authRouter - Authentication router object.
- * @see   module:leaderboard-api-auth-router.router
+ * @see   module:auth-route.router
  */
 import { router as authRouter } from './route-auth/index.js';
 
 /**
- * @const {object} activityRouter - Activity router object.
- * @see   module:leaderboard-api-activity-router.router
+ * @const {object} scoreRouter - Score router object.
+ * @see   module:score-route.router
  */
-import { router as activityRouter } from './route-score/index.js';
+import { router as scoreRouter } from './route-score/index.js';
 
 /**
  * @const {object} leaderboardRouter - Leaderboard router object.
- * @see   module:leaderboard-api-leaderboard-router.router
+ * @see   module:leaderboard-route.router
  */
 import { router as leaderboardRouter } from './route-leaderboard/index.js';
 
+/* Emulate commonJS __filename and __dirname constants */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = dirname(__filename);
+
+/* Configure dotenv path to read the package .env file */
+dotenv.config({path: join(__dirname, './.env')});
+
 /** @const {object} appOptions - The application options. */
 const appOptions = {
+	serverProt: process.env.lb_serverProtocol,
+	serverCert: process.env.lb_serverCert,
+	serverKey : process.env.lb_serverKey,
 	serverHost: process.env.lb_serverHost,
 	serverPort: process.env.lb_serverPort,
+	serverPath: process.env.lb_serverPath,
 	secretKey : process.env.lb_secretKey,
 	connectRd : process.env.lb_connectRedis,
 	serverName: `${process.env.lb_serverName} (${process.platform}) NodeJS/${process.version.substring(1)}`,
@@ -51,7 +67,7 @@ const appOptions = {
 
 /**
  * @const {object} app - The express app object.
- * @desc  The express app object conventionally denotes the Express application.
+ * @desc  The express app object conventionally denotes the express application.
  */
 const app = express();
 
@@ -79,14 +95,25 @@ appOptions.verbose && app.use(morgan('common', { immediate: true }));
  */
 app.use(express.json());
 
-/* Endpoint: /auth */
-app.use('/auth', authRouter);
+/* Endpoint: .../  Method: GET */
+app.get(`${appOptions.serverPath}`, (req, res) => {
 
-/* Endpoint: /score */
-app.use('/score', expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), activityRouter);
+	let resBody = '';
+	resBody += `${appOptions.serverHost}:${appOptions.serverPort}\n`;
+	resBody += `${req.app.get('serverName')}\n`;
 
-/* Endpoint: /leaderboard */
-app.use('/leaderboard', expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), leaderboardRouter);
+	res.setHeader('Server', req.app.get('serverName'));
+	res.status(200).send(resBody);
+});
+
+/* Endpoint: .../auth */
+app.use(`${appOptions.serverPath}/auth`, authRouter);
+
+/* Endpoint: .../score */
+app.use(`${appOptions.serverPath}/score`, expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), scoreRouter);
+
+/* Endpoint: .../leaderboard */
+app.use(`${appOptions.serverPath}/leaderboard`, expressjwt({ secret: app.get('secretKey'), algorithms: ['HS256'] }), leaderboardRouter);
 
 /* Error Handling */
 app.use((err, req, res, next) => {
@@ -130,16 +157,40 @@ catch(err){
 	process.exit(1);
 }
 
-/** @const {object} server - The express server object. */
-const server = app.listen(appOptions.serverPort, appOptions.serverHost, () => {
+/* Start the application server */
 
-	const {port, address:host} = server.address();
+let serverOptions = {};
+let serverModule = http;
 
-	appOptions.verbose && console.log(`... leaderboard-api server is listening to ${host}:${port}`);
-	appOptions.verbose && console.log('... Press CTRL-C to terminate');
-	appOptions.verbose && console.log();
-});
+if(appOptions.serverProt === 'https'){
 
-server.on('error', (err) => {
-	appOptions.verbose && console.error(err.code, err.message);
-});
+	try{
+		serverOptions.key  = fs.readFileSync(join(__dirname, appOptions.serverKey));
+		serverOptions.cert = fs.readFileSync(join(__dirname, appOptions.serverCert));
+
+		serverModule = https;
+	}
+	catch(err){
+		appOptions.serverProt = 'http';
+		serverModule = http;
+	}
+}
+
+/** @const {object} server - The http/https server object. */
+const server = serverModule.createServer(serverOptions, app)
+
+	.listen(appOptions.serverPort, appOptions.serverHost, () => {
+
+		const {port, address:host} = server.address();
+
+		appOptions.verbose && console.log(
+			`... leaderboard-api server is listening to ${appOptions.serverProt}://${host}:${port}`
+		);
+		appOptions.verbose && console.log(
+			'... Press CTRL-C to terminate'
+		);
+		appOptions.verbose && console.log();
+	})
+	.on('error', (err) => {
+		appOptions.verbose && console.error(err.code, err.message);
+	});

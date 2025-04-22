@@ -1,5 +1,5 @@
 /**
- * @module  leaderboard-api-score-route
+ * @module  score-route
  * @desc    The leaderboard-api score route module.
  * @version 1.0.0
  * @author  Essam A. El-Sherif
@@ -23,14 +23,14 @@ import {
 const router = Router();
 
 /*
- * ========================================================================================
- * Endpoint  Method  Authorization  Payload                         Router-level middleware
- * ========================================================================================
- * /score     GET    Yes                                            getUserActMiddleware
- * /score     POST   Yes            {activity:'xxx', score: 'yyy'}  createUserActMiddleware
- * /score     PATCH  Yes            {activity:'xxx'}                deleteUserActMiddleware
- * /score     DELETE Yes                                            deleteUserMiddleware
- * ========================================================================================
+ * ==========================================================================================
+ * Endpoint    Method  Authorization  Payload                         Router-level middleware
+ * ==========================================================================================
+ * .../score   GET     Yes                                            getUserActMiddleware
+ * .../score   POST    Yes            {activity:'xxx', score: 'yyy'}  createUserActMiddleware
+ * .../score   PATCH   Yes            {activity:'xxx'}                deleteUserActMiddleware
+ * .../score   DELETE  Yes                                            deleteUserMiddleware
+ * ==========================================================================================
  */
 
 /* Endpoint: /score Method: GET */

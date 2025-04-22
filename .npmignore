@@ -1,6 +1,6 @@
 # folders
 docs
-tmp
+.tmp
 
 # files
 .lcovrc
