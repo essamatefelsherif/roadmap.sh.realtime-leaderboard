@@ -24,7 +24,7 @@ The system features user authentication, score submission, real-time leaderboard
 
 ### Authentication
 
-* **POST .../api/auth**
+**POST .../api/auth**
 * *Creates none-existing user and responds with JWT token.*
 * Request payload: { username: user@1, password: pwd }.
 * Response status code, message and payload:
@@ -35,8 +35,7 @@ The system features user authentication, score submission, real-time leaderboard
   - 401 Unauthorized ...**Authentication Error: username already exists**.
 
 
-
-* **PUT .../api/auth**
+**PUT .../api/auth**
 * *Updates an existing user's password and responds with JWT token.*
 * Request payload: { username: user@1, pwd: password }.
 * Request payload: { username: user@1, pwd: password, newpassword: newpwd }.
