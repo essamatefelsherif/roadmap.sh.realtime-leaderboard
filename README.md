@@ -24,26 +24,28 @@ The system features user authentication, score submission, real-time leaderboard
 
 ### Authentication
 
-* POST .../api/auth
-* Creates none-existing user and responds with JWT token.
+* **POST .../api/auth**
+* *Creates none-existing user and responds with JWT token.*
 * Request payload: { username: user@1, password: pwd }.
 * Response status code, message and payload:
-  - 200 OK **{ token: 'JSON Web Token' }**.
-  - 400 Bad Request **Authentication Error: none or invalid request payload**.
-  - 400 Bad Request **Authentication Error: no username given**.
-  - 400 Bad Request **Authentication Error: no password given**.
-  - 401 Unauthorized **Authentication Error: username already exists**.
+  - 200 OK ... **{ token: 'JSON Web Token' }**.
+  - 400 Bad Request ... **Authentication Error: none or invalid request payload**.
+  - 400 Bad Request ... **Authentication Error: no username given**.
+  - 400 Bad Request ... **Authentication Error: no password given**.
+  - 401 Unauthorized ...**Authentication Error: username already exists**.
 
-* PUT .../api/auth
-* Updates an existing user's password and responds with JWT token.
+
+
+* **PUT .../api/auth**
+* *Updates an existing user's password and responds with JWT token.*
 * Request payload: { username: user@1, pwd: password }.
 * Request payload: { username: user@1, pwd: password, newpassword: newpwd }.
 * Response status code, message and payload:
-  - 200 OK **{ token: 'JSON Web Token' }**.
-  - 400 Bad Request **Authentication Error: none or invalid request payload**.
-  - 400 Bad Request **Authentication Error: no username given**.
-  - 400 Bad Request **Authentication Error: no password given**.
-  - 401 Unauthorized **Authentication Error: username does not exist**.
+  - 200 OK ... **{ token: 'JSON Web Token' }**.
+  - 400 Bad Request ... **Authentication Error: none or invalid request payload**.
+  - 400 Bad Request ... **Authentication Error: no username given**.
+  - 400 Bad Request ... **Authentication Error: no password given**.
+  - 401 Unauthorized ... **Authentication Error: username does not exist**.
 
 
 ### Score submission
