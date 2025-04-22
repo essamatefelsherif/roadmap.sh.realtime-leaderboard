@@ -26,57 +26,73 @@ npm install [-g] @essamonline/leaderboard-api
 * *Creates none-existing user and responds with JWT token.*
 * Request payload: **{ username: user@1, password: pwd }**.
 * Response status code, message and payload:
-  - 200 OK ... **{ token: <JSON Web Token> }**.
+  - 200 OK ... **{ token: \<JSON Web Token\> }**.
   - 400 Bad Request ... **Authentication Error: none or invalid request payload**.
   - 400 Bad Request ... **Authentication Error: no username given**.
   - 400 Bad Request ... **Authentication Error: no password given**.
   - 401 Unauthorized ... **Authentication Error: username already exists**.
-
 
 **PUT .../api/auth**
 * *Updates an existing user password and responds with JWT token, or just responds with JWT token when no new password was given.*
 * Request payload: **{ username: user@1, pwd: password }**.
 * Request payload: **{ username: user@1, pwd: password, newpassword: newpwd }**.
 * Response status code, message and payload:
-  - 200 OK ... **{ token: <JSON Web Token> }**.
+  - 200 OK ... **{ token: \<JSON Web Token\> }**.
   - 400 Bad Request ... **Authentication Error: none or invalid request payload**.
   - 400 Bad Request ... **Authentication Error: no username given**.
   - 400 Bad Request ... **Authentication Error: no password given**.
   - 401 Unauthorized ... **Authentication Error: username does not exist**.
   - 401 Unauthorized ... **Authentication Error: invalid password**.
-
 
 **PATCH .../api/auth**
 * *Deletes an existing user and removes all her activities scores.*
 * Request payload: **{ username: user@1, pwd: password }**.
 * Response status code, message and payload:
-  - 204 OK.
+  - 204 No Content.
   - 400 Bad Request ... **Authentication Error: none or invalid request payload**.
   - 400 Bad Request ... **Authentication Error: no username given**.
   - 400 Bad Request ... **Authentication Error: no password given**.
   - 401 Unauthorized ... **Authentication Error: username does not exist**.
   - 401 Unauthorized ... **Authentication Error: invalid password**.
 
-
 **GET .../api/auth**
 * *Retrieves a comma separated list of usernames.*
+* Request payload: none.
 * Response status code, message and payload:
   - 200 OK ... **user@1,user@2,user@3**.
 
 
 ### Score submission
 
-
 **POST .../api/score**
 * *Submits user's new score for an activity, which will be created if not exists.*
 * Request payload: **{ activity: 'activity-1', score: 200 }**.
-* Request authorization header: **Authorization: Bearer <JSON Web Token>**
+* Request authorization header: **Authorization: Bearer \<JSON Web Token\>**
 * Response status code, message and payload:
   - 201 Created ... **{activity: 'activity-1', username: 'user@1', score: '200'}**.
   - 401 Unauthorized ... **Authorization Error: No authorization token was found**.
   - 400 Bad Request ... **Submission Error: none or invalid request payload**.
   - 400 Bad Request ... **Submission Error: no activity given**.
   - 400 Bad Request ... **Submission Error: no score given**.
+
+**PATCH .../api/score**
+* *Remove a user's score for an activity.*
+* Request payload: **{ activity: 'activity-1' }**.
+* Request authorization header: **Authorization: Bearer \<JSON Web Token\>**
+* Response status code, message and payload:
+  - 204 No Content.
+  - 401 Unauthorized ... **Authorization Error: No authorization token was found**.
+  - 400 Bad Request ... **Submission Error: none or invalid request payload**.
+  - 400 Bad Request ... **Submission Error: no activity given**.
+
+**DELETE .../api/score**
+* *Remove a user's scores for all activities.*
+* Request payload: none.
+* Request authorization header: **Authorization: Bearer \<JSON Web Token\>**
+* Response status code, message and payload:
+  - 204 No Content.
+  - 401 Unauthorized ... **Authorization Error: No authorization token was found**.
+
 
 
 
