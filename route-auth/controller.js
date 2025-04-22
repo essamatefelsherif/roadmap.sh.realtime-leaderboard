@@ -33,7 +33,7 @@ export async function getUsersMiddleware(req, res){
 
 	try{
 		let users = await usersObj.getUsers();
-		res.status(200).send(users.join(','));
+		res.status(200).send(users.map((u) => u.username).join(','));
 	}
 	catch(err){
 		res.status(401).send(`Authentication Error: ${err.message}`);
