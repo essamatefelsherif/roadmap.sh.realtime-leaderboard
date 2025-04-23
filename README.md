@@ -5,7 +5,7 @@ A backend system implemented in node.js for a real-time leaderboard service for 
 [![Static Badge](https://img.shields.io/badge/roadmap.sh-realtime_leaderboard-blue?logo=roadmap.sh)](https://roadmap.sh/projects/realtime-leaderboard-system)
 [![NPM Version](https://img.shields.io/npm/v/%40essamonline%2Fleaderboard-api?logo=npm)](https://www.npmjs.com/package/@essamonline/leaderboard-api)
 [![NPM Downloads](https://img.shields.io/npm/d18m/%40essamonline%2Fleaderboard-api?logo=npm&color=lightgreen)](https://www.npmjs.com/package/@essamonline/leaderboard-api)
-
+[![Coverage Status](https://coveralls.io/repos/github/essamatefelsherif/roadmap.sh.realtime-leaderboard/badge.svg?branch=main)](https://coveralls.io/github/essamatefelsherif/roadmap.sh.realtime-leaderboard?branch=main)
 
 ## Installation
 
