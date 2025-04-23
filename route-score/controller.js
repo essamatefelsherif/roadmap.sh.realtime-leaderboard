@@ -15,37 +15,10 @@ import { LeaderBoard } from './model.js';
  * @param  {object} req - The request object.
  * @param  {object} res - The response object.
  * @return {Promise}
- * @desc   Router-level middleware function to get user activities.
- */
-export async function getUserActMiddleware(req, res){
-
-	res.setHeader('Server', req.app.get('serverName'));
-
-	const redisKeyA = req.app.get('redisKeyActivity');
-	const redisKeyT = req.app.get('redisKeyTimestamp');
-
-	const leaderboardObj = new LeaderBoard(req.app.get('clientRd'), redisKeyT, redisKeyA);
-
-	try{
-		let activities = await leaderboardObj.getUserActivities(req.auth.username);
-		res.status(200).send(activities.join(','));
-	}
-	catch(err){
-		res.status(401).send(`Authentication Error: ${err.message}`);
-	}
-}
-
-/**
- * @func
- * @async
- * @static
- * @param  {object} req - The request object.
- * @param  {object} res - The response object.
- * @return {Promise}
- * @desc   Router-level middleware function to create a user activity.
+ * @desc   Router-level middleware function to submits user's score for an activity that will be created if nonexistent.
  * @requires module:redis-leaderboard.LeaderBoard.addUserScore
  */
-export async function createUserActMiddleware(req, res){
+export async function addUserScoreMiddleware(req, res){
 
 	res.setHeader('Server', req.app.get('serverName'));
 
@@ -90,21 +63,23 @@ export async function createUserActMiddleware(req, res){
  * @param  {object} req - The request object.
  * @param  {object} res - The response object.
  * @return {Promise}
- * @desc   Router-level middleware function to delete a user activity.
+ * @desc   Router-level middleware function to remove a user's score for an activity.
  * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
  */
-export async function deleteUserActMiddleware(req, res){
+export async function removeUserScoreMiddleware(req, res){
 
 	res.setHeader('Server', req.app.get('serverName'));
 
-	if(Object.keys(req.body).length === 0){
-		res.status(400).send('Submission Error: none or invalid request payload');
-		return;
-	}
+	if(req.method.toUpperCase() === 'PATCH'){
+		if(Object.keys(req.body).length === 0){
+			res.status(400).send('Submission Error: none or invalid request payload');
+			return;
+		}
 
-	if(!('activity' in req.body && req.body.activity)){
-		res.status(400).send('Submission Error: no activity given');
-		return;
+		if(!('activity' in req.body && req.body.activity)){
+			res.status(400).send('Submission Error: no activity given');
+			return;
+		}
 	}
 
 	const redisKeyA = req.app.get('redisKeyActivity');
@@ -114,34 +89,6 @@ export async function deleteUserActMiddleware(req, res){
 
 	try{
 		await leaderboardObj.removeUserScore(req.auth.username, req.body.activity);
-		res.status(204).send();
-	}
-	catch(err){
-		res.status(401).send(`Submission Error: ${err.message}`);
-	}
-}
-
-/**
- * @func
- * @async
- * @static
- * @param  {object} req - The request object.
- * @param  {object} res - The response object.
- * @return {Promise}
- * @desc   Router-level middleware function to delete all user activities.
- * @requires module:redis-leaderboard.LeaderBoard.removeUserScore
- */
-export async function deleteUserMiddleware(req, res){
-
-	res.setHeader('Server', req.app.get('serverName'));
-
-	const redisKeyA = req.app.get('redisKeyActivity');
-	const redisKeyT = req.app.get('redisKeyTimestamp');
-
-	const leaderboardObj = new LeaderBoard(req.app.get('clientRd'), redisKeyT, redisKeyA);
-
-	try{
-		await leaderboardObj.removeUserScore(req.auth.username);
 		res.status(204).send();
 	}
 	catch(err){

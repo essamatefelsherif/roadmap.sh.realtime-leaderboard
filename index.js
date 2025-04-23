@@ -6,6 +6,7 @@
  */
 
 /* Import node.js core modules */
+import crypto            from 'node:crypto';
 import fs                from 'node:fs';
 import http              from 'node:http';
 import https             from 'node:https';
@@ -59,7 +60,7 @@ const appOptions = {
 	serverHost: process.env.lb_serverHost,
 	serverPort: process.env.lb_serverPort,
 	serverPath: process.env.lb_serverPath,
-	secretKey : process.env.lb_secretKey,
+	secretKey : crypto.randomBytes(32).toString('hex'),
 	connectRd : process.env.lb_connectRedis,
 	serverName: `${process.env.lb_serverName} (${process.platform}) NodeJS/${process.version.substring(1)}`,
 	verbose: true,

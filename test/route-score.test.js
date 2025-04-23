@@ -74,11 +74,11 @@ function loadTestData(){
 	let suiteDesc = '';
 	let testObj = null;
 
-	// TEST SUITE ### - Test Score Route - createUserActivity
-	suiteDesc = 'Test Score Route - createUserActivity';
+	// TEST SUITE ### - Test Score Route - addUserScore
+	suiteDesc = 'Test Score Route - addUserScore';
 	suites.set(suiteDesc, []);
 
-	// TEST ### - Test createUserActivity invalid ... test#1
+	// TEST ### - Test addUserScore invalid ... test#1
 	testData = {};
 
 	testObj = {
@@ -90,12 +90,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#1';
+	testData.desc = 'Test addUserScore invalid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity invalid ... test#2
+	// TEST ### - Test addUserScore invalid ... test#2
 	testData = {};
 
 	testObj = {
@@ -107,12 +107,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#2';
+	testData.desc = 'Test addUserScore invalid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity invalid ... test#3
+	// TEST ### - Test addUserScore invalid ... test#3
 	testData = {};
 
 	testObj = {
@@ -124,12 +124,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#3';
+	testData.desc = 'Test addUserScore invalid ... test#3';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity invalid ... test#4
+	// TEST ### - Test addUserScore invalid ... test#4
 	testData = {};
 
 	testObj = {
@@ -141,12 +141,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#4';
+	testData.desc = 'Test addUserScore invalid ... test#4';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity invalid ... test#5
+	// TEST ### - Test addUserScore invalid ... test#5
 	testData = {};
 
 	testObj = {
@@ -158,12 +158,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#5';
+	testData.desc = 'Test addUserScore invalid ... test#5';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity invalid ... test#6
+	// TEST ### - Test addUserScore invalid ... test#6
 	testData = {};
 
 	testObj = {
@@ -175,12 +175,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity invalid ... test#6';
+	testData.desc = 'Test addUserScore invalid ... test#6';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity valid ... test#1
+	// TEST ### - Test addUserScore valid ... test#1
 	testData = {};
 
 	testObj = {
@@ -192,12 +192,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity   valid ... test#1';
+	testData.desc = 'Test addUserScore   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity valid ... test#2
+	// TEST ### - Test addUserScore valid ... test#2
 	testData = {};
 
 	testObj = {
@@ -209,12 +209,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity   valid ... test#2';
+	testData.desc = 'Test addUserScore   valid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test createUserActivity valid ... test#3
+	// TEST ### - Test addUserScore valid ... test#3
 	testData = {};
 
 	testObj = {
@@ -226,16 +226,16 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test createUserActivity   valid ... test#3';
+	testData.desc = 'Test addUserScore   valid ... test#3';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST SUITE ### - Test Score Route - deleteUserActivity
-	suiteDesc = 'Test Score Route - deleteUserActivity';
+	// TEST SUITE ### - Test Score Route - removeUserScore
+	suiteDesc = 'Test Score Route - removeUserScore';
 	suites.set(suiteDesc, []);
 
-	// TEST ### - Test deleteUserActivity invalid ... test#1
+	// TEST ### - Test removeUserScore invalid ... test#1
 	testData = {};
 
 	testObj = {
@@ -247,12 +247,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity invalid ... test#1';
+	testData.desc = 'Test removeUserScore invalid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUserActivity invalid ... test#2
+	// TEST ### - Test removeUserScore invalid ... test#2
 	testData = {};
 
 	testObj = {
@@ -264,12 +264,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity invalid ... test#2';
+	testData.desc = 'Test removeUserScore invalid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUserActivity invalid ... test#3
+	// TEST ### - Test removeUserScore invalid ... test#3
 	testData = {};
 
 	testObj = {
@@ -281,12 +281,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity invalid ... test#3';
+	testData.desc = 'Test removeUserScore invalid ... test#3';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUserActivity invalid ... test#4
+	// TEST ### - Test removeUserScore invalid ... test#4
 	testData = {};
 
 	testObj = {
@@ -298,12 +298,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity invalid ... test#4';
+	testData.desc = 'Test removeUserScore invalid ... test#4';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUserActivity invalid ... test#5
+	// TEST ### - Test removeUserScore invalid ... test#5
 	testData = {};
 
 	testObj = {
@@ -315,12 +315,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity invalid ... test#5';
+	testData.desc = 'Test removeUserScore invalid ... test#5';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUserActivity valid ... test#1
+	// TEST ### - Test removeUserScore valid ... test#1
 	testData = {};
 
 	testObj = {
@@ -332,16 +332,16 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUserActivity   valid ... test#1';
+	testData.desc = 'Test removeUserScore   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST SUITE ### - Test Score Route - deleteUser
-	suiteDesc = 'Test Score Route - deleteUser';
+	// TEST SUITE ### - Test Score Route - removeAllUserScores
+	suiteDesc = 'Test Score Route - removeAllUserScores';
 	suites.set(suiteDesc, []);
 
-	// TEST ### - Test deleteUser invalid ... test#1
+	// TEST ### - Test removeAllUserScores invalid ... test#1
 	testData = {};
 
 	testObj = {
@@ -353,12 +353,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUser invalid ... test#1';
+	testData.desc = 'Test removeAllUserScores invalid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUser valid ... test#1
+	// TEST ### - Test removeAllUserScores valid ... test#1
 	testData = {};
 
 	testObj = {
@@ -370,12 +370,12 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUser   valid ... test#1';
+	testData.desc = 'Test removeAllUserScores   valid ... test#1';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);
 
-	// TEST ### - Test deleteUser valid ... test#2
+	// TEST ### - Test removeAllUserScores valid ... test#2
 	testData = {};
 
 	testObj = {
@@ -387,7 +387,7 @@ function loadTestData(){
 	};
 
 	testData.method = testMethod.bind(testObj);
-	testData.desc = 'Test deleteUser   valid ... test#2';
+	testData.desc = 'Test removeAllUserScores   valid ... test#2';
 
 	testData.skip = false;
 	suites.get(suiteDesc).push(testData);

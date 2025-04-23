@@ -47,7 +47,7 @@ export async function getUsersMiddleware(req, res){
  * @param  {object} req - The request object.
  * @param  {object} res - The response object.
  * @return {Promise}
- * @desc   Router-level middleware function to create none existing user and responds with JWT token.
+ * @desc   Router-level middleware function to create a nonexistent user and responds with JWT token.
  * @requires module:redis-users.Users.createUser
  */
 export async function createUserMiddleware(req, res){

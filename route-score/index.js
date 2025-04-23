@@ -10,10 +10,8 @@ import { Router } from 'express';
 
 /* Import local dependencies */
 import {
-    getUserActMiddleware,
-    createUserActMiddleware,
-    deleteUserActMiddleware,
-    deleteUserMiddleware
+	addUserScoreMiddleware,
+	removeUserScoreMiddleware,
 } from './controller.js';
 
 /**
@@ -23,26 +21,22 @@ import {
 const router = Router();
 
 /*
- * ==========================================================================================
+ * ============================================================================================
  * Endpoint    Method  Authorization  Payload                         Router-level middleware
- * ==========================================================================================
- * .../score   GET     Yes                                            getUserActMiddleware
- * .../score   POST    Yes            {activity:'xxx', score: 'yyy'}  createUserActMiddleware
- * .../score   PATCH   Yes            {activity:'xxx'}                deleteUserActMiddleware
- * .../score   DELETE  Yes                                            deleteUserMiddleware
- * ==========================================================================================
+ * ============================================================================================
+ * .../score   POST    Yes            {activity:'xxx', score: 'yyy'}  addUserScoreMiddleware
+ * .../score   PATCH   Yes            {activity:'xxx'}                removeUserScoreMiddleware
+ * .../score   DELETE  Yes                                            removeUserScoreMiddleware
+ * ============================================================================================
  */
 
-/* Endpoint: /score Method: GET */
-router.get('/', getUserActMiddleware );
-
 /* Endpoint: /score Method: POST */
-router.post('/', createUserActMiddleware );
+router.post('/', addUserScoreMiddleware );
 
 /* Endpoint: /score Method: PATCH */
-router.patch('/', deleteUserActMiddleware );
+router.patch('/', removeUserScoreMiddleware );
 
 /* Endpoint: /score Method: DELETE */
-router.delete('/', deleteUserMiddleware );
+router.delete('/', removeUserScoreMiddleware );
 
 export { router };
