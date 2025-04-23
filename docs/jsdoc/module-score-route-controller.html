@@ -154,7 +154,7 @@
     
 
     
-    <h4 class="name" id=".createUserActMiddleware"><span class="type-signature">(async, static) </span>createUserActMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id=".addUserScoreMiddleware"><span class="type-signature">(async, static) </span>addUserScoreMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -162,7 +162,7 @@
 
 
 <div class="description">
-    Router-level middleware function to create a user activity.
+    Router-level middleware function to submits user's score for an activity that will be created if nonexistent.
 </div>
 
 
@@ -278,7 +278,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line48">line 48</a>
+        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -337,7 +337,7 @@
     
 
     
-    <h4 class="name" id=".deleteUserActMiddleware"><span class="type-signature">(async, static) </span>deleteUserActMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id=".removeUserScoreMiddleware"><span class="type-signature">(async, static) </span>removeUserScoreMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -345,7 +345,7 @@
 
 
 <div class="description">
-    Router-level middleware function to delete a user activity.
+    Router-level middleware function to remove a user's score for an activity.
 </div>
 
 
@@ -461,7 +461,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line96">line 96</a>
+        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -478,367 +478,6 @@
 <ul>
     <li>module:redis-leaderboard.LeaderBoard.removeUserScore</li>
 </ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".deleteUserMiddleware"><span class="type-signature">(async, static) </span>deleteUserMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Router-level middleware function to delete all user activities.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>req</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The request object.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The response object.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line134">line 134</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-<h5>Requires:</h5>
-<ul>
-    <li>module:redis-leaderboard.LeaderBoard.removeUserScore</li>
-</ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".getUserActMiddleware"><span class="type-signature">(async, static) </span>getUserActMiddleware<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Router-level middleware function to get user activities.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>req</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The request object.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The response object.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="route-score_controller.js.html">route-score/controller.js</a>, <a href="route-score_controller.js.html#line20">line 20</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
 
 
 
@@ -897,7 +536,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Apr 22 2025 06:51:10 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Apr 23 2025 17:27:02 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
