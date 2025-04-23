@@ -22,7 +22,7 @@ npm install [-g] @essamonline/leaderboard-api
 
 ### Authentication
 
-[POST .../api/auth]()
+#### [POST .../api/auth]()
 * *Creates none-existing user and responds with JWT token.*
 * Request payload: **{ username: user@1, password: pwd }**.
 * Response status code, message and payload:
