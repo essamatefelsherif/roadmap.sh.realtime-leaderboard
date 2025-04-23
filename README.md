@@ -3,6 +3,9 @@
 A backend system implemented in node.js for a real-time leaderboard service for ranking and scoring. The system features a *configurable environment*, *support for http/https*, *user authentication*, *score submission*, *real-time leaderboard updates*, and *score history tracking* using [Redis](https://redis.io/), the most popular NoSQL in-memory key-value data store.
 
 [![Static Badge](https://img.shields.io/badge/roadmap.sh-realtime_leaderboard-blue?logo=roadmap.sh)](https://roadmap.sh/projects/realtime-leaderboard-system)
+[![NPM Version](https://img.shields.io/npm/v/%40essamonline%2Fleaderboard-api?logo=npm)](https://www.npmjs.com/package/@essamonline/leaderboard-api)
+[![NPM Downloads](https://img.shields.io/npm/d18m/%40essamonline%2Fleaderboard-api?logo=npm&color=lightgreen)](https://www.npmjs.com/package/@essamonline/leaderboard-api)
+
 
 ## Installation
 
@@ -12,16 +15,16 @@ npm install [-g] @essamonline/leaderboard-api
 
 ## Features
 
-* **Configurable Environmentt**: 
-* **HTTP/HTTPS**:
-* **User Authentication**: Users should be able to register and log in to the system.
-* **Score Submission**: Users should be able to submit their scores for different activities.
-* **Leaderboard Updates**: Display a global leaderboard showing the top users across all activities.
-* **User Rankings**: Users should be able to view their rankings on the leaderboard.
-* **Top Players Report**: Generate reports on the top players for a specific period.
+* **Configurable Environmentt**: Load environment variables from a **'.env'** file using [dotenv](https://www.npmjs.com/package/dotenv) package.
+* **HTTP/HTTPS**: Provide the path to the key and certificate files if HTTPS was chosen.
+* **User Authentication**: Users will register and log in to the system using [JSON Web Tokens](https://jwt.io/introduction).
+* **Score Submission**: Users will submit their scores for different activities.
+* **Leaderboard Updates**: Users can retrieve a global leaderboard showing the top users across all activities.
+* **User Rankings**: Users can retrieve their rankings on the leaderboard.
+* **Top Users Report**: Generate reports on the top players for a specific period.
 
 
-Sample '.env' file located in the package root directory:
+**Sample '.env' file located at the package root directory:**
 ```
 ############### leaderboard-api  ###############
 lb_serverProtocol=https
