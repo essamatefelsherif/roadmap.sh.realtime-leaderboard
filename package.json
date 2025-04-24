@@ -14,7 +14,7 @@
 		"devUpdate"   : "npm run testReport && npm run devGenhtml && npm run devDoc",
 		"devCoveralls": "coveralls < docs/coverage/node/lcov.info"
 	},
-	"keywords": ["api", "rest", "redis", "leaderboard"],
+	"keywords": ["api", "rest", "redis", "jwt", "leaderboard"],
 	"author": {
 		"name" : "Essam A. El-Sherif",
 		"email": "esm.elsh@gmail.com",

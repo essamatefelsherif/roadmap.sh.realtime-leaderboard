@@ -183,7 +183,6 @@ const server = serverModule.createServer(serverOptions, app)
 	.listen(appOptions.serverPort, appOptions.serverHost, () => {
 
 		const {port, address:host} = server.address();
-
 		appOptions.verbose && console.log(
 			`... leaderboard-api server is listening to ${appOptions.serverProt}://${host}:${port}`
 		);

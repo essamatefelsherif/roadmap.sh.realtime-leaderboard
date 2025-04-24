@@ -29,6 +29,7 @@ package-lock.json
 
 # other folders
 .tmp/
+cert/
 
 # coveralls config
 .coveralls.yml

@@ -26,7 +26,7 @@ npm install [-g] @essamonline/leaderboard-api
 
 **Sample '.env' file located at the package root directory:**
 ```
-############### leaderboard-api  ###############
+############### leaderboard-api ###############
 lb_serverProtocol=https
 lb_serverKey=cert/localhost.key
 lb_serverCert=cert/localhost.cert
