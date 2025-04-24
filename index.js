@@ -54,15 +54,15 @@ dotenv.config({path: join(__dirname, './.env')});
 
 /** @const {object} appOptions - The application options. */
 const appOptions = {
-	serverProt: process.env.lb_serverProtocol,
+	serverProt: process.env.lb_serverProtocol || 'http',
 	serverCert: process.env.lb_serverCert,
 	serverKey : process.env.lb_serverKey,
-	serverHost: process.env.lb_serverHost,
-	serverPort: process.env.lb_serverPort,
-	serverPath: process.env.lb_serverPath,
+	serverHost: process.env.lb_serverHost    || 'localhost',
+	serverPort: process.env.lb_serverPort    || '8080',
+	serverPath: process.env.lb_serverPath    || '/api',
+	connectRd : process.env.lb_connectRedis  || 'redis://localhost:6379',
 	secretKey : crypto.randomBytes(32).toString('hex'),
-	connectRd : process.env.lb_connectRedis,
-	serverName: `${process.env.lb_serverName} (${process.platform}) NodeJS/${process.version.substring(1)}`,
+	serverName: `${process.env.lb_serverName || 'leaderboard-api/1.0.0'} (${process.platform}) NodeJS/${process.version.substring(1)}`,
 	verbose: true,
 };
 

@@ -6,3 +6,4 @@ cert
 # files
 .lcovrc
 .coveralls.yml
+.env
